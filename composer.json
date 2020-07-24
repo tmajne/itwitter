@@ -1,0 +1,19 @@
+{
+    "name": "tmajne/itwitter",
+    "license": "",
+    "type": "project",
+    "authors": [
+        {
+            "name": "TT",
+            "email": "ttomczyk@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.4",
+        "ext-curl": "*",
+        "ext-json": "*"
+    },
+    "autoload": {
+        "psr-4": {"Tmajne\\": "src/"}
+    }
+}
