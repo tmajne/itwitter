@@ -4,20 +4,25 @@ declare(strict_types=1);
 
 namespace Tmajne\Service\Twitter;
 
-class Twitter
-{
-    private string $accessToken;
-    private string $accessTokenSecret;
+use Tmajne\Service\Twitter\Client\HttpClient;
+use Tmajne\Service\Twitter\Factory\TweetFactory;
 
-    public function __construct(string $accessToken, string $accessTokenSecret)
+final class Twitter
+{
+    private string $key;
+    private string $secret;
+
+    public function __construct(string $key, string $secret)
     {
-        $this->accessToken = $accessToken;
-        $this->accessTokenSecret = $accessTokenSecret;
+        $this->key = $key;
+        $this->secret = $secret;
     }
 
-
-    public function say()
+    public function userTimeline(string $user, int $count): array
     {
-        echo 'cokolwiek';
+        $factory = new TweetFactory();
+        $http = new HttpClient($this->key, $this->secret);
+        $data = $http->userTimeline($user, $count);
+        return $factory->createFromTimeline($data);
     }
 }
