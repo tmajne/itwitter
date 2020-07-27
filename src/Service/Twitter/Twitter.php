@@ -9,13 +9,22 @@ use Tmajne\Service\Twitter\Factory\TweetFactory;
 
 final class Twitter
 {
+    private static string $KEY;
+    private static string $SECRET;
+
     private string $key;
     private string $secret;
 
-    public function __construct(string $key, string $secret)
+    public static function init(string $key, string $secret): void
     {
-        $this->key = $key;
-        $this->secret = $secret;
+        self::$KEY = $key;
+        self::$SECRET = $secret;
+    }
+
+    public function __construct(string $key = null, string $secret = null)
+    {
+        $this->key = $key ?? self::$KEY;
+        $this->secret = $secret ?? self::$SECRET;
     }
 
     public function userTimeline(string $user, int $count): array

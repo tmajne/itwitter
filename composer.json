@@ -12,9 +12,17 @@
         "php": ">=7.4",
         "ext-curl": "*",
         "ext-json": "*",
-        "cboden/ratchet": "^0.4.3"
+        "cboden/ratchet": "^0.4.3",
+        "vlucas/phpdotenv": "^5.1"
     },
     "autoload": {
         "psr-4": {"Tmajne\\": "src/"}
+    },
+    "scripts": {
+        "server-php": "@php -S localhost:8888 -t public",
+        "server-websocket": "@php bin/server.php"
+    },
+    "config": {
+        "process-timeout": 0
     }
 }
