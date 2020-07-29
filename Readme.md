@@ -18,5 +18,5 @@ By default the websocket server is working on: `localhost:8880` and webserwer is
 ## Websocket server
 * `composer run-script server-websocket`
 
-## Testy
+## Tests (examples)
 *  ./vendor/bin/phpunit --configuration phpunit.xml
