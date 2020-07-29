@@ -19,7 +19,7 @@
         "psr-4": {"Tmajne\\": "src/"}
     },
     "scripts": {
-        "server-php": "@php -S localhost:8888 -t public",
+        "server-php": "@php -S 127.0.0.1:8888 -t public",
         "server-websocket": "@php bin/server.php"
     },
     "config": {

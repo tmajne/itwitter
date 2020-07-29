@@ -10,7 +10,7 @@ class DotenvProvider
 {
     public static function init(): void
     {
-        $dotenv = Dotenv::createImmutable(__DIR__ . '\..\..\/');
+        $dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
         $dotenv->load();
     }
 }
