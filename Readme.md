@@ -7,3 +7,6 @@ I don't use getenv function instead of $_ENV because that function is not thread
 ## Websocket server
 * `php bin/server.php`
 * `composer run-script server-websocket`
+
+## Testy
+*  ./vendor/bin/phpunit --configuration phpunit.xml

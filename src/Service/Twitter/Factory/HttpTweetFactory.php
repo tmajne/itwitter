@@ -12,7 +12,7 @@ use Tmajne\Service\Twitter\Dto\UserDto;
 /**
  * @internal
  */
-final class TweetFactory
+final class HttpTweetFactory implements FactoryInterface
 {
     public function createFromTimeline(array $data): array
     {

@@ -16,9 +16,11 @@ class TwitterSocket implements MessageComponentInterface
     private const DEFAULT_USER = 'bbc';
 
     private SplObjectStorage $clients;
+    private Twitter $twitter;
 
     public function __construct() {
         $this->clients = new SplObjectStorage;
+        $this->twitter = new Twitter();
     }
 
     public function onOpen(ConnectionInterface $conn)
@@ -86,7 +88,7 @@ class TwitterSocket implements MessageComponentInterface
     {
         //$count = rand(2, 10);
         $count = 10;
-        $tweets = (new Twitter())->userTimeline($user, $count);
+        $tweets = $this->twitter->userTimeline($user, $count);
         return json_encode($tweets);
     }
 }

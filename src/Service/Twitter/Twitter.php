@@ -4,34 +4,37 @@ declare(strict_types=1);
 
 namespace Tmajne\Service\Twitter;
 
-use Tmajne\Service\Twitter\Client\HttpClient;
-use Tmajne\Service\Twitter\Factory\TweetFactory;
+use BadMethodCallException;
+use Tmajne\Service\Twitter\Client\ClientInterface;
+use Tmajne\Service\Twitter\Factory\FactoryInterface;
 
 final class Twitter
 {
-    private static string $KEY;
-    private static string $SECRET;
+    private static ClientInterface $CLIENT;
+    private static FactoryInterface $FACTORY;
 
-    private string $key;
-    private string $secret;
+    private ClientInterface $client;
+    private FactoryInterface $factory;
 
-    public static function init(string $key, string $secret): void
+    public static function init(ClientInterface $client, FactoryInterface $factory): void
     {
-        self::$KEY = $key;
-        self::$SECRET = $secret;
+        self::$CLIENT = $client;
+        self::$FACTORY = $factory;
     }
 
     public function __construct(string $key = null, string $secret = null)
     {
-        $this->key = $key ?? self::$KEY;
-        $this->secret = $secret ?? self::$SECRET;
+        if(!self::$FACTORY || !self::$CLIENT) {
+            throw new BadMethodCallException('You must call Twitter:init before');
+        }
+
+        $this->factory = self::$FACTORY;
+        $this->client = self::$CLIENT;
     }
 
     public function userTimeline(string $user, int $count): array
     {
-        $factory = new TweetFactory();
-        $http = new HttpClient($this->key, $this->secret);
-        $data = $http->userTimeline($user, $count);
-        return $factory->createFromTimeline($data);
+        $data = $this->client->userTimeline($user, $count);
+        return $this->factory->createFromTimeline($data);
     }
 }
