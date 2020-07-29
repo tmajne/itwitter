@@ -7,7 +7,7 @@ require __DIR__ . '/../vendor/autoload.php';
 
 (new Kernel())->init();
 
-$user = 'bbc';
+$user = 'hell';
 
 $tweets = (new Twitter())->userTimeline($user, 2);
 

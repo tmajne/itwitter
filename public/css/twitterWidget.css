@@ -1,0 +1,21 @@
+.twitter-tweet {
+    margin: 4px;
+    padding: 4px 10px;
+    border: 1px solid #cccccc;
+}
+
+.twitter-error {
+    margin: 4px;
+    padding: 4px 10px;
+    border: 2px solid #ff0000;
+}
+
+.twitter-info {
+    margin: 4px;
+    padding: 4px 10px;
+    border: 1px solid #158907;
+}
+
+.twitter-social span {
+    margin-right: 10px;
+}

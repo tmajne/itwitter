@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Tmajne\Service\Twitter\Client;
 
+use DomainException;
+
 /**
  * @internal
  */
@@ -33,7 +35,13 @@ final class HttpClient implements ClientInterface
             "Authorization: {$token['token_type']} {$token['access_token']}"
         ];
 
-        return $this->request($uri, $method, $data, $headers);
+        $result = $this->request($uri, $method, $data, $headers);
+
+        if (array_key_exists('error', $result)) {
+            throw new DomainException($result['error']);
+        }
+
+        return $result;
     }
 
     private function authorizationToken(): array

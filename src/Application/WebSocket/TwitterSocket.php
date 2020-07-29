@@ -7,13 +7,15 @@ namespace Tmajne\Application\WebSocket;
 use Exception;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
+use Ratchet\WebSocket\WsConnection;
 use SplObjectStorage;
 use Tmajne\Service\Twitter\Twitter;
 
 class TwitterSocket implements MessageComponentInterface
 {
-    protected SplObjectStorage $clients;
-    private ?string $lastTweetsChecksum = null;
+    private const DEFAULT_USER = 'bbc';
+
+    private SplObjectStorage $clients;
 
     public function __construct() {
         $this->clients = new SplObjectStorage;
@@ -21,24 +23,18 @@ class TwitterSocket implements MessageComponentInterface
 
     public function onOpen(ConnectionInterface $conn)
     {
-        $this->clients->attach($conn);
         echo "New connection! ({$conn->resourceId})\n";
-
-        $conn->send(
-            $this->getTweets()
-        );
+        $tweets = $this->getTweets(self::DEFAULT_USER);
+        $this->setClientData($conn, self::DEFAULT_USER, md5($tweets));
+        $conn->send($tweets);
     }
 
     public function onMessage(ConnectionInterface $from, $msg)
     {
-        $receivers = count($this->clients) - 1;
-        echo "Connection {$from->resourceId} sending message to $receivers other connection\n";
-
-        foreach ($this->clients as $client) {
-            if ($from !== $client) {
-                $client->send($msg);
-            }
-        }
+        echo "Connection {$from->resourceId} sending message: $msg\n";
+        $tweets = $this->getTweets($msg);
+        $this->setClientData($from, $msg, md5($tweets));
+        $from->send($tweets);
     }
 
     public function onClose(ConnectionInterface $conn)
@@ -50,28 +46,47 @@ class TwitterSocket implements MessageComponentInterface
     public function onError(ConnectionInterface $conn, Exception $e)
     {
         echo "An error has occurred: {$e->getMessage()}\n";
-        $conn->close();
+        $conn->send(json_encode(['error' => $e->getMessage()]));
     }
 
     public function onLoop($options = array())
     {
-        $tweets = $this->getTweets();
-        $tweetsChecksum = md5($tweets);
+        echo "onLooop\n";
 
-        if ($tweetsChecksum !== $this->lastTweetsChecksum) {
-            foreach($this->clients as $client) {
-                $client->send($tweets);
+        $loopTweets = [];
+        foreach($this->clients as $client) {
+            /** @var WsConnection $client */
+            ['user' => $user, 'lastTweetsChecksum' => $lastTweetsChecksum] = $this->clients[$client];
+
+            if (empty($loopTweets[$user])) {
+                $loopTweets[$user] = $this->getTweets($user);
             }
-            $this->lastTweetsChecksum = md5($tweets);
-        } else {
-            echo "Nic się nie zmieniło\n";
+            $tweets = $loopTweets[$user];
+            $tweetsChecksum = md5($tweets);
+
+            if ($lastTweetsChecksum === $tweetsChecksum) {
+                continue;
+            }
+
+            $this->setClientData($client, $user, $tweetsChecksum);
+            $client->send($tweets);
         }
+        unset($loopTweets);
     }
 
-    private function getTweets(): string
+    private function setClientData(WsConnection $client, string $user, string $checksum): void
     {
-        $user = 'bbc';
-        $tweets = (new Twitter())->userTimeline($user, 10);
+        $this->clients[$client] = [
+            'user' => $user,
+            'lastTweetsChecksum' => $checksum
+        ];
+    }
+
+    private function getTweets($user): string
+    {
+        //$count = rand(2, 10);
+        $count = 10;
+        $tweets = (new Twitter())->userTimeline($user, $count);
         return json_encode($tweets);
     }
 }
